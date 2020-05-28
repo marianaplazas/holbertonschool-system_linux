@@ -7,6 +7,7 @@ def print_usage():
     print("Usage: read_write_heap.py pid search_s replace_s")
     exit(1)
 
+
 def read_write_heap(pid, search_s, replace_s, only_writable=True):
     mem_perm = 'rw' if only_writable else 'r-'
     maps_filename = "/proc/{}/maps".format(pid)
