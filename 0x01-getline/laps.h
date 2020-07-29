@@ -3,20 +3,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 /**
- *@id: the unique identifier of the car
- *@laps: the number of laps in the race
- *@next: the pointer to the next node/car
+ * struct car - singly-linked list
+ * @id: ID of car
+ * @laps: laps car has completed
+ * @next: next car
  */
-typedef struct cars
+typedef struct car
 {
 	int id;
-	int laps;
-	struct cars *next;
-}car;
-void free_list(car *list);
-car *id_exists(car *head, int id);
+	size_t laps;
+	struct car *next;
+} car_t;
+
+car_t *check_id(car_t *head, int id);
+car_t *insert_car(car_t **head, int id);
+void free_list(car_t *head);
+void print_cars(car_t *list);
 void race_state(int *id, size_t size);
-car *add_car(car **head, int id);
-#endif
+
+#endif /*LAPS_H*/

@@ -1,5 +1,12 @@
 #include "laps.h"
-car *id_exist(car *head, int id)
+
+/**
+ * check_id - checks if id is in list
+ * @head: head of list of cars
+ * @id: id to search for
+ * Return: pointer to node with id otherwise NULL
+ */
+car_t *check_id(car_t *head, int id)
 {
 	while (head != NULL)
 	{
@@ -9,13 +16,38 @@ car *id_exist(car *head, int id)
 	}
 	return (NULL);
 }
+
 /**
- *
+ * free_list - frees a linked-list
+ * @head: head of list
+ * Return: void
  */
-car *add_car(car **head, int id)
+void free_list(car_t *head)
 {
-	car *current = NULL;
-	car *new = NULL;
+	car_t *next;
+
+	if (head == NULL)
+		return;
+
+	next = head;
+	while (next != NULL)
+	{
+		next = next->next;
+		free(head);
+		head = next;
+	}
+}
+
+/**
+ * insert_car - inserts a car node into the list of cars
+ * @head: pointer to pointer of head of list
+ * @id: id of new car
+ * Return: new list
+ */
+car_t *insert_car(car_t **head, int id)
+{
+	car_t *current = NULL;
+	car_t *new = NULL;
 
 	if (!head)
 		return (NULL);
@@ -49,48 +81,57 @@ car *add_car(car **head, int id)
 }
 
 /**
- *
+ * print_cars - prints list of cars in race
+ * @list: list of cars
+ * Return: void
  */
-void free_list(car *list)
+void print_cars(car_t *list)
 {
-	car *tmp;
+	car_t *current;
 
-	while (cars != NULL)
+	current = list;
+
+	while (current != NULL)
 	{
-		tmp = cars;
-		cars = cars->next;
-		free(tmp);
+		printf("Car %d [%lu laps]\n", current->id, current->laps);
+		current = current->next;
 	}
 }
+
 /**
- *
+ * race_state - keeps track of the number of laps made by several
+ * cars in a race
+ * @id: array of int representing the "identifier" of each car
+ * @size: size of array
+ * Return: void
  */
 void race_state(int *id, size_t size)
 {
-	static car *cars;
-	car *check;
+	static car_t *car;
+	car_t *check;
 	size_t i = 0;
 
 	if (size == 0)
 	{
-		free_list(cars);
+		free_list(car);
 		return;
 	}
 
-	if (cars == NULL)
+	if (car == NULL)
 	{
-		cars = add_car(&car, id[0]);
-		cars->laps--;
+		car = insert_car(&car, id[0]);
+		car->laps--;
 	}
 	for (i = 0; i < size; i++)
 	{
-		check = id_exists(car, id[i]);
+		check = check_id(car, id[i]);
 		if (!check)
 			insert_car(&car, id[i]);
 		else
 			check->laps++;
 	}
+
 	printf("Race state:\n");
-	for (node = head; node; node = node->next)
-		printf("Car %d [%lu laps]\n", node->id, node->laps);
+	print_cars(car);
 }
+
