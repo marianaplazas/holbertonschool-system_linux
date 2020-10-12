@@ -5,18 +5,19 @@
 #include <stdio.h>
 
 /**
- * struct car - holds race car date
- * @id: the race car unique id
- * @laps: how many laps this car mae
- * @next: next node in linked list
+ * struct linkedlist - singly linked list of integers
+ * @n: integer value
+ * @lap: current lap
+ * @next: pointer to next node
  */
-typedef struct car
+typedef struct linkedlist
 {
-	int id;
-	size_t laps;
-	struct car *next;
-} Car;
+	int n;
+	size_t lap;
+	struct linkedlist *next;
+} linkedlist;
 
+/* laps.c */
 void race_state(int *id, size_t size);
 
-#endif
+#endif /* LAPS_H */

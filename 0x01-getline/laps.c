@@ -1,70 +1,103 @@
 #include "laps.h"
 
-
 /**
- * add_car - adds a car to linked list
- * @head: pointer to head node
- * @id: the car id to add
+ * printstate - prints race state
+ * @head: pointer to pointer of head
  */
-void add_car(Car **head, int id)
+void printstate(linkedlist **head)
 {
-	Car *node, *temp;
+	linkedlist **cur;
 
-	if (!*head || id < (*head)->id)
-	{
-		node = malloc(sizeof(Car));
-		if (!node)
-			exit(EXIT_FAILURE);
-		node->id = id;
-		node->laps = 0;
-		node->next = *head;
-		*head = node;
-		printf("Car %d joined the race\n", id);
-		return;
-	}
-	for (node = *head; node->next && node->next->id <= id; node = node->next)
-		;
-	if (node->id == id)
-	{
-		node->laps++;
-		return;
-	}
-	temp = malloc(sizeof(Car));
-	if (!temp)
-		exit(EXIT_FAILURE);
-	temp->id = id;
-	temp->laps = 0;
-	temp->next = node->next;
-	node->next = temp;
-	printf("Car %d joined the race\n", id);
+	printf("Race state:\n");
+	for (cur = head; *cur; cur = &(*cur)->next)
+		printf("Car %i [%lu laps]\n", (*cur)->n, (*cur)->lap);
 }
 
 /**
- * race_state - determines the state
- * @id: array of vehicle ids
- * @size: size of above array
+ * insertsort - inserts linked list in a sorted order
+ * @head: pointer to pointer of head node
+ * @new: pointer to new node
+ */
+void insertsort(linkedlist **head, linkedlist *new)
+{
+	linkedlist **cur;
+
+	cur = head;
+	while (*cur && new->n > (*cur)->n)
+		cur = &(*cur)->next;
+	new->next = *cur;
+	*cur = new;
+}
+
+/**
+ * createnode - creates new linked list node
+ * @id: car id
+ *
+ * Return: created linked list node
+ */
+linkedlist *createnode(int id)
+{
+	linkedlist *new;
+
+	new = malloc(sizeof(*new));
+	if (!new)
+		return (NULL);
+	new->n = id;
+	new->lap = 0;
+	new->next = NULL;
+	return (new);
+}
+
+/**
+ * checknew - checks for new car id
+ * @head: pointer to pointer of head
+ * @id: pointer to array of id's
+ * @size: size of array
+ */
+void checknew(linkedlist **head, int *id, size_t size)
+{
+	linkedlist **cur;
+	size_t i;
+
+	for (i = 0; i < size; ++i)
+	{
+		for (cur = head; *cur; cur = &(*cur)->next)
+			if (id[i] == (*cur)->n)
+			{
+				++(*cur)->lap;
+				break;
+			}
+		if (!*cur)
+		{
+			printf("Car %i joined the race\n", id[i]);
+			insertsort(head, createnode(id[i]));
+		}
+	}
+}
+
+/**
+ * race_state - tracks number of laps made by cars in a race
+ * @id: array of int representing "identifier" of each car
+ * @size: array size
  */
 void race_state(int *id, size_t size)
 {
-	static Car *head;
-	Car *node;
-	size_t i;
+	static linkedlist *head;
+	linkedlist *cur;
 
-	if (!size)
+	cur = head;
+	if (size)
 	{
-		while (head)
-		{
-			node = head;
-			head = head->next;
-			free(node);
-		}
-		return;
+		checknew(&head, id, size);
+		printstate(&head);
 	}
-	for (i = 0; i < size; i++)
-		add_car(&head, id[i]);
-
-	printf("Race state:\n");
-	for (node = head; node; node = node->next)
-		printf("Car %d [%lu laps]\n", node->id, node->laps);
-
+	else
+	{
+		while (cur)
+		{
+			cur = cur->next;
+			free(head);
+			head = cur;
+		}
+	}
 }
